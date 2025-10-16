@@ -27,7 +27,7 @@ const sessionConfig = {
 // Rate limiting pour les tentatives de connexion
 const loginLimiter = rateLimit({
   windowMs: 30 * 1000, // 30 secondes
-  max: 3, // 3 tentatives maximum
+  max: 5,
   message: {
     error: 'Trop de tentatives de connexion. Veuillez attendre 30 secondes.'
   },
@@ -134,25 +134,9 @@ const escapeHtml = (text) => {
 app.locals.escapeHtml = escapeHtml;
 
 // Routes
-app.get('/', (req, res) => {
-  res.render('layout', {
-    title: 'Accueil - Location de Chats',
-    body: `
-      <div class="container">
-        <h1>Bienvenue sur Rent a Cat</h1>
-        <p>La plateforme sécurisée pour louer un chat pour la journée!</p>
-        <div class="nav-links">
-          ${req.session.userId ? 
-            `<p>Connecté en tant que: ${escapeHtml(req.session.userEmail)}</p>
-             <a href="/logout" class="btn btn-secondary">Se déconnecter</a>` :
-            `<a href="/login" class="btn btn-primary">Se connecter</a>
-             <a href="/register" class="btn btn-secondary">S'inscrire</a>`
-          }
-        </div>
-      </div>
-    `
-  });
-});
+const catRoutes = require('./routes/catRoute');
+app.use('/', catRoutes);
+
 
 // Route de déconnexion
 app.post('/logout', (req, res) => {
