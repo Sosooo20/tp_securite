@@ -12,6 +12,7 @@ const { generalLimiter } = require('./middlewares/rateLimiter');
 // Import des routes
 const indexRoutes = require('./routes/index');
 const authRoutes = require('./routes/auth');
+const reservationRoutes = require('./routes/reservations');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -80,6 +81,7 @@ app.locals.escapeHtml = escapeHtml;
 // Routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // Middleware de gestion d'erreur
 app.use((err, req, res, next) => {
@@ -104,19 +106,6 @@ async function startServer() {
     await initDatabase();
     app.listen(PORT, () => {
       console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
-      console.log('📁 Architecture restructurée avec:');
-      console.log('   ├── 📂 controllers/');
-      console.log('   ├── 📂 middlewares/');
-      console.log('   ├── 📂 routes/');
-      console.log('   ├── 📂 services/');
-      console.log('   └── 📂 models/');
-      console.log('🔒 Sécurités actives:');
-      console.log('   ✓ Headers de sécurité (Helmet)');
-      console.log('   ✓ Rate limiting (3 tentatives login / 30s)');
-      console.log('   ✓ Sessions sécurisées');
-      console.log('   ✓ Protection CSRF');
-      console.log('   ✓ Protection XSS');
-      console.log('   ✓ Protection contre les injections SQL');
     });
   } catch (error) {
     console.error('❌ Erreur lors du démarrage du serveur:', error);

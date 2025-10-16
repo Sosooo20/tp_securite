@@ -15,6 +15,7 @@ class HomeController {
       res.render('home', {
         title: 'Accueil - Rent a Cat',
         chats: chats,
+        chatsJSON: JSON.stringify(chats),
         session: req.session
       });
     } catch (error) {
@@ -66,6 +67,47 @@ class HomeController {
         </div>
       `
     });
+  }
+
+  /**
+   * Affiche la page de réservation pour un chat spécifique
+   */
+  static async showReservationPage(req, res) {
+    try {
+      const chatId = req.params.chatId;
+      const chat = await Chat.findById(chatId);
+      
+      if (!chat) {
+        return res.status(404).render('layout', {
+          title: 'Chat non trouvé - Rent a Cat',
+          body: `
+            <div class="container">
+              <h1>Chat non trouvé</h1>
+              <p>Le chat demandé n'existe pas ou n'est plus disponible.</p>
+              <a href="/" class="btn btn-primary">Retour à l'accueil</a>
+            </div>
+          `
+        });
+      }
+
+      res.render('reservation', {
+        title: `Réserver ${chat.nom} - Rent a Cat`,
+        chat: chat,
+        session: req.session
+      });
+    } catch (error) {
+      console.error('Erreur lors du chargement de la page de réservation:', error);
+      res.status(500).render('layout', {
+        title: 'Erreur - Rent a Cat',
+        body: `
+          <div class="container">
+            <h1>Erreur</h1>
+            <div class="error">Une erreur est survenue lors du chargement de la page.</div>
+            <a href="/" class="btn btn-secondary">Retour à l'accueil</a>
+          </div>
+        `
+      });
+    }
   }
 }
 

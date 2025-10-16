@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="/images/rent_a_cat.jpg" alt="Rent a Cat Logo">
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Accueil</a>
+                    </li>
+                    
+                    <% if (typeof session !== 'undefined' && session && session.userId) { %>
+                        <!-- Utilisateur connecté -->
+                        <li class="nav-item">
+                            <a href="/reservations" class="nav-link">Réservations</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="/logout" style="display: inline;">
+                                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 500;">
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <!-- Utilisateur non connecté -->
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="nav-link">Inscription</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <div class="container">
+            <div class="reservation-container">
+                <!-- Informations du chat -->
+                <div class="chat-info-section">
+                    <h1>Réserver <%= chat.nom %></h1>
+                    
+                    <div class="chat-details">
+                        <div class="chat-image">
+                            <% if (chat.image) { %>
+                                <img src="<%= chat.image %>" alt="<%= chat.nom %>">
+                            <% } else { %>
+                                <img src="/images/default-cat.jpg" alt="<%= chat.nom %>">
+                            <% } %>
+                        </div>
+                        
+                        <div class="chat-infos">
+                            <h2>🐱 <%= chat.nom %></h2>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">Race :</span>
+                                    <span class="value"><%= chat.race %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Âge :</span>
+                                    <span class="value"><%= chat.age %> ans</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Caractère :</span>
+                                    <span class="value"><%= chat.caractere %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Jouet préféré :</span>
+                                    <span class="value"><%= chat.jouet_prefere %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Prix par jour :</span>
+                                    <span class="value price"><%= chat.prix %> €</span>
+                                </div>
+                            </div>
+                            
+                            <% if (chat.description) { %>
+                                <div class="description">
+                                    <h3>Description :</h3>
+                                    <p><%= chat.description %></p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section réservation -->
+                <div class="reservation-section">
+                    <h2>📅 Sélectionner les dates</h2>
+                    
+                    <div class="date-selection">
+                        <div class="date-input-group">
+                            <label for="dateReservation">Date de réservation :</label>
+                            <input type="date" id="dateReservation" name="dateReservation" min="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                    </div>
+
+                    <!-- Bouton de réservation -->
+                    <div class="reservation-button-container" id="reservationButton" style="display: none;">
+                        <div class="selected-date-info">
+                            <p><strong>Date sélectionnée :</strong> <span id="dateSelectionnee">-</span></p>
+                            <p><strong>Prix :</strong> <%= chat.prix %> € pour la journée</p>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-reserve" id="confirmerReservation">
+                            � Réserver <%= chat.nom %>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const prixParJour = <%= chat.prix %>;
+        const dateReservationInput = document.getElementById('dateReservation');
+        const reservationButton = document.getElementById('reservationButton');
+        const dateSelectionnee = document.getElementById('dateSelectionnee');
+
+        function afficherBoutonReservation() {
+            if (!dateReservationInput.value) {
+                reservationButton.style.display = 'none';
+                return;
+            }
+
+            const dateChoisie = new Date(dateReservationInput.value);
+            dateSelectionnee.textContent = dateChoisie.toLocaleDateString('fr-FR');
+            reservationButton.style.display = 'block';
+        }
+
+        // Écouter les changements de date
+        dateReservationInput.addEventListener('change', afficherBoutonReservation);
+
+        // Confirmer la réservation
+        document.getElementById('confirmerReservation').addEventListener('click', function() {
+            if (!dateReservationInput.value) {
+                alert('Veuillez sélectionner une date de réservation');
+                return;
+            }
+
+            const dateChoisie = new Date(dateReservationInput.value);
+            alert(`Réservation confirmée!\n\nChat: <%= chat.nom %>\nDate: ${dateChoisie.toLocaleDateString('fr-FR')}\nPrix: <%= chat.prix %> €\n\n(Fonctionnalité de paiement à venir)`);
+        });
+    </script>
+</body>
+</html>

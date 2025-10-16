@@ -9,4 +9,7 @@ router.get('/', HomeController.showHome);
 // Route des réservations (protégée)
 router.get('/reservations', requireAuth, HomeController.showReservations);
 
+// Route de réservation d'un chat spécifique
+router.get('/reservation/:chatId', HomeController.showReservationPage);
+
 module.exports = router;

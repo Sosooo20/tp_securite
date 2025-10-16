@@ -446,50 +446,108 @@ ul.chats-list {
     list-style: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
 }
 
 ul.chats-list li {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+ul.chats-list li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0069B4, #dc3545);
 }
 
 ul.chats-list li:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
 }
 
 ul.chats-list li img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 10px auto;
-    border-radius: 8px;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+ul.chats-list li:hover img {
+    transform: scale(1.05);
 }
 
 ul.chats-list li strong {
     display: block;
-    font-size: 20px;
-    margin-bottom: 5px;
-    color: #dc3545;
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #0069B4;
+    font-weight: 700;
+    text-align: center;
 }
 
 ul.chats-list li p {
-    margin: 5px 0;
+    margin: 8px 0;
     color: #555;
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.4;
 }
 
-/* Pour séparer visuellement les chats si tu gardes <hr> */
-ul.chats-list hr {
+ul.chats-list li p b {
+    color: #333;
+    font-weight: 600;
+}
+
+.btn-details {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #0069B4, #004d87);
+    color: white;
     border: none;
-    border-top: 1px solid #eee;
-    margin: 15px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-details:hover {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive amélioré */
@@ -497,4 +555,411 @@ ul.chats-list hr {
     ul.chats-list {
         grid-template-columns: 1fr;
     }
+}
+
+/* Page de réservation */
+.reservation-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 20px;
+}
+
+.chat-info-section {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.chat-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chat-image img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.chat-infos h2 {
+    color: #0069B4;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.info-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #0069B4;
+}
+
+.info-item .label {
+    font-weight: 600;
+    color: #333;
+}
+
+.info-item .value {
+    color: #666;
+}
+
+.info-item .value.price {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.description {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #dc3545;
+}
+
+.description h3 {
+    color: #dc3545;
+    margin-bottom: 10px;
+}
+
+.reservation-section {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.reservation-section h2 {
+    color: #0069B4;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+
+.date-selection {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.date-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.date-input-group label {
+    font-weight: 600;
+    color: #333;
+}
+
+.date-input-group input[type="date"] {
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.date-input-group input[type="date"]:focus {
+    border-color: #0069B4;
+    outline: none;
+}
+
+.reservation-summary {
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid #0069B4;
+}
+
+.reservation-summary h3 {
+    color: #0069B4;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.summary-details {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary-item.total {
+    border-bottom: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: #28a745;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 2px solid #28a745;
+}
+
+.reservation-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.reservation-actions .btn {
+    flex: 1;
+    max-width: 200px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Responsive pour la page de réservation */
+@media (max-width: 768px) {
+    .reservation-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .chat-info-section,
+    .reservation-section {
+        padding: 20px;
+    }
+    
+    .reservation-actions {
+        flex-direction: column;
+    }
+    
+    .reservation-actions .btn {
+        max-width: none;
+    }
+}
+
+/* Bouton de réservation */
+.reservation-button-container {
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    border: 2px solid #0069B4;
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.reservation-button-container:hover {
+    border-color: #28a745;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+}
+
+.selected-date-info {
+    margin-bottom: 20px;
+    padding: 18px;
+    background: white;
+    border-radius: 10px;
+    border-left: 4px solid #0069B4;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.selected-date-info p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #495057;
+}
+
+.selected-date-info strong {
+    color: #212529;
+    font-weight: 600;
+}
+
+.btn-reserve {
+    font-size: 18px;
+    padding: 16px 40px;
+    font-weight: 700;
+    min-width: 280px;
+    background: linear-gradient(145deg, #28a745, #20c997);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-reserve:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(40, 167, 69, 0.4);
+    background: linear-gradient(145deg, #20c997, #28a745);
+}
+
+/* Conteneurs des boutons - toujours visibles */
+.button-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin: 20px 0 !important;
+    text-align: center !important;
+}
+
+/* Nouveaux boutons de réservation - toujours visibles */
+.btn-reserve-simple {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: linear-gradient(145deg, #6c757d, #495057) !important;
+    border: none !important;
+    color: white !important;
+    padding: 15px 30px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    margin: 15px 0 !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    width: 250px !important;
+    min-height: 50px !important;
+}
+
+.btn-reserve-simple:hover {
+    background: linear-gradient(145deg, #495057, #6c757d) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3) !important;
+}
+
+.btn-prix {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: linear-gradient(145deg, #17a2b8, #138496) !important;
+    border: none !important;
+    color: white !important;
+    padding: 15px 30px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    margin: 15px 0 !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    width: 250px !important;
+    min-height: 50px !important;
+}
+
+.btn-prix:hover {
+    background: linear-gradient(145deg, #138496, #17a2b8) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3) !important;
+}
+
+/* Section de calcul de prix */
+.price-calculation {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    margin: 30px 0 !important;
+    padding: 20px !important;
+    background: #f8f9fa !important;
+    border-radius: 10px !important;
+    border: 2px solid #17a2b8 !important;
+    transition: all 0.3s ease !important;
+}
+
+.price-calculation.show,
+.price-calculation[style*="block"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.price-calculation h3 {
+    color: #17a2b8 !important;
+    margin-bottom: 15px !important;
+    font-size: 20px !important;
+}
+
+.price-calculation div {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+}
+
+.price-calculation p {
+    margin: 10px 0 !important;
+    color: #495057 !important;
+}
+
+.price-calculation p:last-child {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    color: #28a745 !important;
+    border-top: 2px solid #28a745 !important;
+    padding-top: 15px !important;
+    margin-top: 15px !important;
+}
+
+.btn-reserve-final {
+    background: linear-gradient(145deg, #28a745, #20c997);
+    border: none;
+    color: white;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 10px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-reserve-final:hover {
+    background: linear-gradient(145deg, #20c997, #28a745);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(40, 167, 69, 0.4);
+}
+
+/* Affichage du prix */
+.price-display {
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+    border: 2px solid #28a745;
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 25px;
+    text-align: center;
+}
+
+.price-info {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.price-info p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #495057;
+}
+
+.price-info .total-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #28a745;
+    border-top: 2px solid #28a745;
+    padding-top: 15px;
+    margin-top: 15px;
 }

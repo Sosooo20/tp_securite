@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="/images/rent_a_cat.jpg" alt="Rent a Cat Logo">
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Accueil</a>
+                    </li>
+                    
+                    <% if (typeof session !== 'undefined' && session && session.userId) { %>
+                        <!-- Utilisateur connecté -->
+                        <li class="nav-item">
+                            <a href="/reservations" class="nav-link">Réservations</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="/logout" style="display: inline;">
+                                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 500;">
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <!-- Utilisateur non connecté -->
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="nav-link">Inscription</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <div class="container">
+            <div class="reservation-container">
+                <!-- Informations du chat -->
+                <div class="chat-info-section">
+                    <h1>Réserver <%= chat.nom %></h1>
+                    
+                    <div class="chat-details">
+                        <div class="chat-image">
+                            <% if (chat.image) { %>
+                                <img src="<%= chat.image %>" alt="<%= chat.nom %>">
+                            <% } else { %>
+                                <img src="/images/default-cat.jpg" alt="<%= chat.nom %>">
+                            <% } %>
+                        </div>
+                        
+                        <div class="chat-infos">
+                            <h2>🐱 <%= chat.nom %></h2>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">Race :</span>
+                                    <span class="value"><%= chat.race %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Âge :</span>
+                                    <span class="value"><%= chat.age %> ans</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Caractère :</span>
+                                    <span class="value"><%= chat.caractere %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Jouet préféré :</span>
+                                    <span class="value"><%= chat.jouet_prefere %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Prix par jour :</span>
+                                    <span class="value price"><%= chat.prix %> €</span>
+                                </div>
+                            </div>
+                            
+                            <% if (chat.description) { %>
+                                <div class="description">
+                                    <h3>Description :</h3>
+                                    <p><%= chat.description %></p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section réservation -->
+                <div class="reservation-section">
+                    <h2>📅 Sélectionner les dates</h2>
+                    
+                    <form id="reservationForm">
+                        <div class="date-selection">
+                            <div class="date-input-group">
+                                <label for="dateDebut">Date de début :</label>
+                                <input type="date" id="dateDebut" name="dateDebut" min="<%= new Date().toISOString().split('T')[0] %>" required>
+                            </div>
+                            
+                            <div class="date-input-group">
+                                <label for="dateFin">Date de fin :</label>
+                                <input type="date" id="dateFin" name="dateFin" min="<%= new Date().toISOString().split('T')[0] %>" required>
+                            </div>
+
+                            <!-- Boutons après les champs -->
+                            <div class="buttons-section" style="margin: 30px 0; text-align: center;">
+                                <div class="button-container" style="margin: 20px 0;">
+                                    <button type="button" class="btn btn-info btn-prix" id="btnGenererPrix">
+                                        � Générer un prix
+                                    </button>
+                                </div>
+                                
+                                <div class="button-container" style="margin: 20px 0;">
+                                    <button type="button" class="btn btn-secondary btn-reserve-simple" id="btnReserver">
+                                        🐱 Réserver <%= chat.nom %>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Affichage du calcul de prix -->
+                            <div class="price-calculation" id="priceCalculation" style="display: none; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #17a2b8;">
+                                <h3 style="color: #17a2b8; margin-bottom: 15px;">📊 Calcul du prix</h3>
+                                <div style="font-size: 16px; line-height: 1.6;">
+                                    <p><strong>Période :</strong> <span id="periodText">-</span></p>
+                                    <p><strong>Nombre de jours :</strong> <span id="nombreJoursText">0</span> jour(s)</p>
+                                    <p><strong>Prix par jour :</strong> <%= chat.prix %> €</p>
+                                    <p style="font-size: 20px; font-weight: bold; color: #28a745; border-top: 2px solid #28a745; padding-top: 15px; margin-top: 15px;">
+                                        <strong>Prix total :</strong> <span id="prixTotalText">0</span> €
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        console.log('Script de réservation chargé');
+        const prixParJour = <%= chat.prix %>;
+        const chatId = <%= chat.id %>;
+        const dateDebutInput = document.getElementById('dateDebut');
+        const dateFinInput = document.getElementById('dateFin');
+        const btnReserver = document.getElementById('btnReserver');
+        const btnGenererPrix = document.getElementById('btnGenererPrix');
+        const priceCalculation = document.getElementById('priceCalculation');
+        const periodText = document.getElementById('periodText');
+        const nombreJoursText = document.getElementById('nombreJoursText');
+        const prixTotalText = document.getElementById('prixTotalText');
+
+        console.log('Prix par jour:', prixParJour);
+        console.log('Éléments trouvés:', {
+            dateDebutInput: !!dateDebutInput,
+            dateFinInput: !!dateFinInput,
+            btnGenererPrix: !!btnGenererPrix,
+            priceCalculation: !!priceCalculation,
+            periodText: !!periodText,
+            nombreJoursText: !!nombreJoursText,
+            prixTotalText: !!prixTotalText
+        });
+
+        // Mettre à jour la date minimum pour la fin quand on change la date de début
+        dateDebutInput.addEventListener('change', function() {
+            console.log('Date de début changée:', this.value);
+            if (this.value) {
+                dateFinInput.min = this.value;
+                console.log('Date minimum mise à jour pour la fin');
+            }
+        });
+
+        // UNIQUE fonction pour calculer le prix
+        btnGenererPrix.addEventListener('click', function() {
+            console.log('=== BOUTON GÉNÉRER PRIX CLIQUÉ ===');
+            
+            // Vérifier que les deux dates sont sélectionnées
+            if (!dateDebutInput.value || !dateFinInput.value) {
+                alert('Veuillez sélectionner les dates de début et de fin');
+                console.log('Dates manquantes');
+                return;
+            }
+
+            console.log('Dates sélectionnées:', {
+                debut: dateDebutInput.value,
+                fin: dateFinInput.value
+            });
+
+            const dateDebut = new Date(dateDebutInput.value);
+            const dateFin = new Date(dateFinInput.value);
+
+            // Vérifier que la date de fin est après la date de début
+            if (dateFin <= dateDebut) {
+                alert('La date de fin doit être après la date de début');
+                console.log('Date de fin invalide');
+                return;
+            }
+
+            // Calculer le nombre de jours
+            const diffTime = Math.abs(dateFin - dateDebut);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Calculer le prix total
+            const prixTotal = diffDays * prixParJour;
+
+            console.log('Calculs:', {
+                diffTime: diffTime,
+                diffDays: diffDays,
+                prixParJour: prixParJour,
+                prixTotal: prixTotal
+            });
+
+            // Mettre à jour l'affichage
+            console.log('Mise à jour des éléments...');
+            periodText.textContent = `Du ${dateDebut.toLocaleDateString('fr-FR')} au ${dateFin.toLocaleDateString('fr-FR')}`;
+            nombreJoursText.textContent = diffDays;
+            prixTotalText.textContent = prixTotal;
+
+            // Afficher la section de calcul
+            priceCalculation.style.display = 'block';
+            priceCalculation.style.visibility = 'visible';
+
+            console.log('=== CALCUL TERMINÉ ===');
+            console.log('Section affichée, prix total:', prixTotal);
+        });
+
+        // Bouton réserver (pour plus tard)
+        btnReserver.addEventListener('click', function() {
+            console.log('Bouton Réserver cliqué');
+            alert('Fonctionnalité de réservation à venir');
+        });
+    </script>
+</body>
+</html>

@@ -89,17 +89,37 @@ async function initDatabase() {
         // --- TABLE RESERVATIONS (many-to-many) ---
         await pool.query(`
       CREATE TABLE IF NOT EXISTS reservations (
+        id SERIAL PRIMARY KEY,
         id_user INT NOT NULL,
         id_chat INT NOT NULL,
         date_debut DATE NOT NULL,
         date_fin DATE NOT NULL,
-        PRIMARY KEY (id_user, id_chat),
+        prix_total DECIMAL(10,2) DEFAULT 0,
+        statut VARCHAR(50) DEFAULT 'en_attente',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_res_user FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
         CONSTRAINT fk_res_chat FOREIGN KEY (id_chat) REFERENCES chats(id) ON DELETE CASCADE
       )
     `);
 
         console.log('✅ Tables "users", "chats" et "reservations" créées/vérifiées');
+
+        // Ajouter les colonnes manquantes à la table reservations si elles n'existent pas
+        try {
+            await pool.query(`
+                ALTER TABLE reservations 
+                ADD COLUMN IF NOT EXISTS id SERIAL PRIMARY KEY,
+                ADD COLUMN IF NOT EXISTS prix_total DECIMAL(10,2) DEFAULT 0,
+                ADD COLUMN IF NOT EXISTS statut VARCHAR(50) DEFAULT 'en_attente',
+                ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            `);
+            console.log('✅ Colonnes ajoutées à la table reservations');
+        } catch (error) {
+            // Ignorer les erreurs si les colonnes existent déjà
+            console.log('ℹ️ Colonnes de la table reservations déjà existantes');
+        }
 
         // Ajouter les colonnes manquantes à la table chats si elles n'existent pas
         await pool.query(`
