@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="/images/rent_a_cat.jpg" alt="Rent a Cat Logo">
+                <span class="logo-text">ChatRental</span>
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Accueil</a>
+                    </li>
+                    
+                    <% if (session && session.userId) { %>
+                        <!-- Utilisateur connecté -->
+                        <li class="nav-item">
+                            <a href="/reservations" class="nav-link">Réservations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/profile" class="nav-link">Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="/logout" style="display: inline;">
+                                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 500;">
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <!-- Utilisateur non connecté -->
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="nav-link">Inscription</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <div class="profile-container">
+            <div class="profile-header">
+                <!-- Section image de profil -->
+                <div class="profile-image-section">
+                    <div class="profile-image-container" onclick="document.getElementById('profileImageInput').click()">
+                        <img 
+                            src="<%= user.image || '/images/default-avatar.png' %>" 
+                            alt="Photo de profil" 
+                            class="profile-image"
+                            id="profileImagePreview"
+                        >
+                        <div class="image-overlay">
+                            <span>📷<br>Changer la photo</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666; text-align: center;">
+                        Cliquez pour changer
+                    </p>
+                </div>
+
+                <!-- Informations actuelles -->
+                <div class="profile-info">
+                    <h1>Modifier mon profil</h1>
+                    <p><strong>📧 Email actuel:</strong> <%= user.email %></p>
+                    <p><strong>👤 Nom actuel:</strong> <%= user.prenom %> <%= user.nom %></p>
+                    <p><strong>📅 Membre depuis:</strong> <%= new Date(user.created_at).toLocaleDateString('fr-FR') %></p>
+                </div>
+            </div>
+
+            <!-- Formulaire de modification -->
+            <form method="POST" action="/profile/edit" enctype="multipart/form-data" id="profileForm">
+                <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+                
+                <!-- Input caché pour l'image -->
+                <input 
+                    type="file" 
+                    id="profileImageInput" 
+                    name="profileImage" 
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    class="hidden-file-input"
+                >
+
+                <!-- Nom et Prénom -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prenom">Prénom *</label>
+                        <input 
+                            type="text" 
+                            id="prenom" 
+                            name="prenom" 
+                            value="<%= user.prenom %>" 
+                            required 
+                            maxlength="100"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom *</label>
+                        <input 
+                            type="text" 
+                            id="nom" 
+                            name="nom" 
+                            value="<%= user.nom %>" 
+                            required 
+                            maxlength="100"
+                        >
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        value="<%= user.email %>" 
+                        required 
+                        maxlength="255"
+                    >
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description">Description personnelle</label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        placeholder="Parlez-nous de vous, de vos préférences concernant les chats..."
+                        maxlength="500"
+                    ><%= user.description || '' %></textarea>
+                    <small style="color: #666;">Maximum 500 caractères</small>
+                </div>
+
+                <!-- Boutons -->
+                <div class="btn-container">
+                    <a href="/profile" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Gestion de l'aperçu de l'image
+        document.getElementById('profileImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Vérification du type de fichier
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    showToast('Format d\'image non supporté. Utilisez JPG, PNG ou WebP.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Vérification de la taille (2MB max)
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('L\'image est trop volumineuse. Maximum 2MB autorisé.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Aperçu de l'image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImagePreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                showToast('Image sélectionnée ! N\'oubliez pas de sauvegarder.', 'info');
+            }
+        });
+
+        // Fonction pour afficher les toasts
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = 'toast show';
+            
+            if (type === 'error') {
+                toast.classList.add('error');
+            } else {
+                toast.classList.remove('error');
+            }
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // Gestion de la soumission du formulaire
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validation côté client
+            const prenom = document.getElementById('prenom').value.trim();
+            const nom = document.getElementById('nom').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!prenom || !nom || !email) {
+                showToast('Veuillez remplir tous les champs obligatoires.', 'error');
+                return;
+            }
+
+            // Validation email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('Format d\'email invalide.', 'error');
+                return;
+            }
+
+            // Soumission du formulaire
+            const formData = new FormData(this);
+            
+            fetch('/profile/edit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Profil mis à jour avec succès !');
+                    // Redirection après 2 secondes
+                    setTimeout(() => {
+                        window.location.href = '/profile';
+                    }, 2000);
+                } else {
+                    showToast(data.message || 'Erreur lors de la mise à jour.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showToast('Erreur de connexion. Veuillez réessayer.', 'error');
+            });
+        });
+
+        // Afficher un toast si il y a un message de succès/erreur dans l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success')) {
+            showToast('✅ Profil mis à jour avec succès !');
+        }
+        if (urlParams.get('error')) {
+            showToast(urlParams.get('error'), 'error');
+        }
+    </script>
+</body>
+</html>
