@@ -8,14 +8,14 @@
     "dev": "node app.js"
   },
   "dependencies": {
-    "mysql2": "^3.6.0",
+    "pg": "^8.11.3",
     "argon2": "^0.40.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "ejs": "^3.1.9",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
-    "express-mysql-session": "^3.0.0"
+    "connect-pg-simple": "^9.0.1"
   },
   "keywords": ["security", "web", "chat", "rental"],
   "author": "Your Name",

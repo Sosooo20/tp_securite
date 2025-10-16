@@ -7,7 +7,7 @@ ChatRental est une application web sécurisée permettant de louer un chat pour 
 ## Prérequis
 
 - Node.js (version 14 ou supérieure)
-- MySQL Server (version 5.7 ou supérieure)
+- PostgreSQL Server (version 12 ou supérieure)
 - npm (généralement installé avec Node.js)
 
 ## Installation
@@ -24,14 +24,15 @@ ChatRental est une application web sécurisée permettant de louer un chat pour 
    ```
 
 3. **Configuration de la base de données**
-   - Démarrer MySQL Server
+   - Démarrer PostgreSQL Server
    - Modifier les paramètres de connexion dans `config/database.js` :
      ```javascript
      const dbConfig = {
        host: 'localhost',
-       user: 'votre_utilisateur_mysql',
-       password: 'votre_mot_de_passe_mysql',
-       database: 'tp_securite_chat'
+       user: 'postgres',
+       password: 'votre_mot_de_passe_postgresql',
+       database: 'tp_securite_chat',
+       port: 5432
      };
      ```
 
@@ -82,7 +83,7 @@ tp_securite/
 - **Validation des entrées** : Regex strictes pour noms, emails, etc.
 
 ### 5. Protection contre l'injection SQL
-- **Requêtes préparées** : Toutes les requêtes utilisent `pool.execute()` avec paramètres
+- **Requêtes préparées** : Toutes les requêtes utilisent `pool.query()` avec paramètres ($1, $2, etc.)
 - **Validation des données** : Validation stricte avant insertion en base
 
 ### 6. Headers de sécurité (Helmet.js)
@@ -101,7 +102,7 @@ tp_securite/
 ### Table `users`
 ```sql
 CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   nom VARCHAR(100) NOT NULL,
   prenom VARCHAR(100) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -109,9 +110,25 @@ CREATE TABLE users (
   image VARCHAR(255) NULL,
   description TEXT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_email (email)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Index sur email pour les performances
+CREATE INDEX idx_users_email ON users(email);
+
+-- Trigger pour mise à jour automatique de updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_users_updated_at
+  BEFORE UPDATE ON users
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 ```
 
 ## Comptes de test
@@ -126,6 +143,49 @@ NODE_ENV=production
 SESSION_SECRET=votre_secret_session_tres_long_et_aleatoire
 PORT=3000
 ```
+
+## Installation PostgreSQL
+
+### macOS (Homebrew)
+```bash
+# Installation
+brew install postgresql
+
+# Démarrage du service
+brew services start postgresql
+
+# Première connexion (utilisateur par défaut)
+psql postgres
+
+# Créer un utilisateur avec mot de passe
+CREATE USER votre_user WITH PASSWORD 'votre_password';
+ALTER USER votre_user CREATEDB;
+```
+
+### Ubuntu/Debian
+```bash
+# Installation
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+
+# Démarrage du service
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Première connexion
+sudo -u postgres psql
+
+# Créer un utilisateur
+CREATE USER votre_user WITH PASSWORD 'votre_password';
+ALTER USER votre_user CREATEDB;
+```
+
+### Windows
+1. Télécharger PostgreSQL : https://www.postgresql.org/download/windows/
+2. Installer avec l'installateur
+3. Noter le mot de passe du superutilisateur `postgres`
+4. Démarrer le service PostgreSQL via services.msc
+5. Utiliser pgAdmin ou psql pour la gestion
 
 ## Logs de sécurité
 
@@ -145,12 +205,13 @@ L'application log automatiquement :
 ## Dépendances principales
 
 - **express** : Framework web minimaliste
-- **mysql2** : Driver MySQL avec support des requêtes préparées
+- **pg** : Driver PostgreSQL avec support des requêtes préparées
 - **argon2** : Fonction de hachage sécurisée
 - **express-session** : Gestion des sessions
 - **express-rate-limit** : Limitation du taux de requêtes
 - **helmet** : Headers de sécurité
 - **ejs** : Moteur de templates
+- **connect-pg-simple** : Store de sessions PostgreSQL
 
 ## Support
 

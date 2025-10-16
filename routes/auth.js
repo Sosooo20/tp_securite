@@ -79,12 +79,12 @@ router.post('/login', loginLimiter, async (req, res) => {
     const pool = getPool();
     
     // Rechercher l'utilisateur avec requête préparée (protection SQL injection)
-    const [users] = await pool.execute(
-      'SELECT id, nom, prenom, email, mot_de_passe FROM users WHERE email = ?',
+    const result = await pool.query(
+      'SELECT id, nom, prenom, email, mot_de_passe FROM users WHERE email = $1',
       [email]
     );
 
-    if (users.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).render('login', {
         title: 'Connexion - Rent a Cat',
         error: 'Email ou mot de passe incorrect.',
@@ -92,7 +92,7 @@ router.post('/login', loginLimiter, async (req, res) => {
       });
     }
 
-    const user = users[0];
+    const user = result.rows[0];
 
     // Vérifier le mot de passe avec Argon2
     const isValidPassword = await argon2.verify(user.mot_de_passe, password);
@@ -211,12 +211,12 @@ router.post('/register', async (req, res) => {
     const pool = getPool();
 
     // Vérifier si l'email existe déjà
-    const [existingUsers] = await pool.execute(
-      'SELECT id FROM users WHERE email = ?',
+    const existingUserResult = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
       [email]
     );
 
-    if (existingUsers.length > 0) {
+    if (existingUserResult.rows.length > 0) {
       return res.status(409).render('register', {
         title: 'Inscription - Rent a Cat',
         error: 'Un compte avec cet email existe déjà.',
@@ -234,12 +234,13 @@ router.post('/register', async (req, res) => {
     });
 
     // Insérer le nouvel utilisateur avec requête préparée
-    const [result] = await pool.execute(
-      'INSERT INTO users (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)',
+    const insertResult = await pool.query(
+      'INSERT INTO users (nom, prenom, email, mot_de_passe) VALUES ($1, $2, $3, $4) RETURNING id',
       [nom, prenom, email, hashedPassword]
     );
 
-    console.log(`Nouvel utilisateur créé: ${email} (ID: ${result.insertId})`);
+    const newUserId = insertResult.rows[0].id;
+    console.log(`Nouvel utilisateur créé: ${email} (ID: ${newUserId})`);
 
     res.render('register', {
       title: 'Inscription - Rent a Cat',
