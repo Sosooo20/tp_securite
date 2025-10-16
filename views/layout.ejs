@@ -1,24 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        /* Reset et styles de base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding-top: 80px; /* Espace pour le header fixe */
+        }
+
+        /* Header Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0069B4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+            margin-right: 15px;
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 0;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 25px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: #dc3545;
+            border-bottom-color: #fff;
+        }
+
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            border-bottom-color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                height: auto;
+                padding: 10px 20px;
+            }
+
+            .logo {
+                margin-bottom: 10px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0;
+            }
+
+            .nav-link {
+                padding: 15px 12px;
+                font-size: 14px;
+            }
+
+            body {
+                padding-top: 120px;
+            }
+        }
+
+        /* Contenu principal */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #0069B4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #004d87;
+        }
+
+        .btn-primary {
+            background-color: #0069B4;
+        }
+
+        .btn-primary:hover {
+            background-color: #004d87;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 10px;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            margin-right: 10px;
+        }
+
+        /* Styles pour le contenu de la page d'accueil */
+        .welcome-content {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-content h1 {
+            color: #0069B4;
+            margin-bottom: 20px;
+        }
+
+        .welcome-content p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
 <body>
-    <% if (chats && chats.length > 0) { %>
-        <div class="container">
-            <h2>Nos chats disponibles à la réservation</h2>
-            <ul>
-                <% chats.forEach(chat => { %>
-                    <li>
-                        <strong><%= chat.nom %></strong> - <%= chat.race %> - <%= chat.age %> ans<br>
-                        Caractère: <%= chat.caractere %><br>
-                        Jouet préféré: <%= chat.jouet_prefere %><br>
-                        Prix: <%= chat.prix %> €<br>
-                        Description: <%= chat.description %><br>
-                        <% if (chat.image) { %>
-                            <img src="<%= chat.image %>" alt="<%= chat.nom %>" width="150">
-                        <% } %>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="/images/rent_a_cat.jpg" alt="Rent a Cat Logo">
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Accueil</a>
                     </li>
-                    <hr>
-                <% }) %>
-            </ul>
+                    
+                    <% if (typeof session !== 'undefined' && session && session.userId) { %>
+                        <!-- Utilisateur connecté -->
+                        <li class="nav-item">
+                            <a href="/reservations" class="nav-link">Réservations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/profile" class="nav-link">Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="/logout" style="display: inline;">
+                                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 500;">
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <!-- Utilisateur non connecté -->
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="nav-link">Inscription</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
         </div>
-    <% } else { %>
-        <p>Aucun chat disponible pour le moment.</p>
-    <% } %>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <% if (typeof body !== 'undefined') { %>
+            <%- body %>
+        <% } %>
+    </main>
 </body>
