@@ -49,33 +49,35 @@
     <!-- Contenu principal -->
     <main>
         <div class="container">
-            <h1>Bienvenue sur Rent a Cat</h1>
-            <p>La plateforme sécurisée pour louer un chat pour la journée!</p>
-            
-            <% if (chats && chats.length > 0) { %>
-                <div class="container">
-                    <h2>Nos chats disponibles à la réservation</h2>
-                    <ul>
-                        <% chats.forEach(chat => { %>
-                            <li>
-                                <strong><%= chat.nom %></strong> - <%= chat.race %> - <%= chat.age %> ans<br>
-                                Caractère: <%= chat.caractere %><br>
-                                Jouet préféré: <%= chat.jouet_prefere %><br>
-                                Prix: <%= chat.prix %> €<br>
-                                Description: <%= chat.description %><br>
-                                <% if (chat.image) { %>
-                                    <img src="<%= chat.image %>" alt="<%= chat.nom %>" width="150">
-                                <% } %>
-                            </li>
-                            <hr>
-                        <% }) %>
-                    </ul>
-                </div>
-            <% } else { %>
-                <p>Aucun chat disponible pour le moment.</p>
-            <% } %>
-            
+            <h2>Nos chats disponibles à la réservation</h2>
+            <ul class="chats-list">
+                <% chats.forEach(chat => { %>
+                    <li>
+                        <% if (chat.image) { %>
+                            <img src="<%= chat.image %>" alt="<%= chat.nom %>">
+                        <% } %>
+                        <strong><%= chat.nom %></strong>
+                        <p><b>Race :</b> <%= chat.race %> - <%= chat.age %> ans</p>
+                        <p><b>Caractère :</b> <%= chat.caractere %></p>
+                        <p><b>Prix :</b> <%= chat.prix %> € /j</p>
+
+                        <!-- Bouton dans chaque carte -->
+                        <button class="btn-details"
+                            data-nom="<%= chat.nom %>"
+                            data-race="<%= chat.race %>"
+                            data-age="<%= chat.age %>"
+                            data-caractere="<%= chat.caractere %>"
+                            data-jouet="<%= chat.jouet_prefere %>"
+                            data-description="<%= chat.description %>"
+                            data-prix="<%= chat.prix %>"
+                            data-image="<%= chat.image %>">
+                            Réserver
+                        </button>
+                    </li>
+                <% }) %>
+            </ul>
         </div>
     </main>
+<script src="/js/modal.js"></script>
 </body>
 </html>
