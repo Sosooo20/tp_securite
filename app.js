@@ -81,6 +81,14 @@ app.use((req, res, next) => {
     req.session.csrfTokens = {};
   }
   
+  // Rendre les informations de session disponibles dans toutes les vues
+  res.locals.session = req.session;
+  res.locals.user = req.session.userId ? {
+    id: req.session.userId,
+    email: req.session.userEmail,
+    name: req.session.userName
+  } : null;
+  
   // Fonction pour générer un nouveau token CSRF
   res.locals.generateCSRFToken = (formName) => {
     const token = crypto.randomBytes(32).toString('hex');
@@ -136,22 +144,126 @@ app.locals.escapeHtml = escapeHtml;
 // Routes
 app.get('/', (req, res) => {
   res.render('layout', {
-    title: 'Accueil - Location de Chats',
+    title: 'Accueil - Rent a Cat',
     body: `
-      <div class="container">
+      <div class="container welcome-content">
         <h1>Bienvenue sur Rent a Cat</h1>
         <p>La plateforme sécurisée pour louer un chat pour la journée!</p>
+        ${req.session.userId ? 
+          `<div class="welcome-content">
+             <p>✅ Connecté en tant que: <strong>${escapeHtml(req.session.userName)}</strong></p>
+             <p>📧 Email: <strong>${escapeHtml(req.session.userEmail)}</strong></p>
+             <div class="nav-links">
+               <a href="/reservations" class="btn btn-primary">Mes Réservations</a>
+               <a href="/profile" class="btn btn-secondary">Mon Profil</a>
+             </div>
+           </div>` :
+          `<div class="welcome-content">
+             <p>Connectez-vous pour accéder à toutes les fonctionnalités !</p>
+             <div class="nav-links">
+               <a href="/login" class="btn btn-primary">Se connecter</a>
+               <a href="/register" class="btn btn-secondary">Créer un compte</a>
+             </div>
+           </div>`
+        }
+      </div>
+    `
+  });
+});
+
+// Route Réservations (protégée par authentification)
+app.get('/reservations', requireAuth, (req, res) => {
+  res.render('layout', {
+    title: 'Mes Réservations - Rent a Cat',
+    body: `
+      <div class="container">
+        <h1>Mes Réservations</h1>
+        <p>Voici la liste de vos réservations de chats.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>🐱 Réservation #001</h3>
+          <p><strong>Chat:</strong> Minou le Persan</p>
+          <p><strong>Date:</strong> 20 octobre 2025</p>
+          <p><strong>Statut:</strong> <span style="color: #28a745;">✅ Confirmée</span></p>
+          <button class="btn btn-danger" style="margin-top: 10px;">Annuler la réservation</button>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>🐱 Réservation #002</h3>
+          <p><strong>Chat:</strong> Garfield le Maine Coon</p>
+          <p><strong>Date:</strong> 25 octobre 2025</p>
+          <p><strong>Statut:</strong> <span style="color: #ffc107;">⏳ En attente</span></p>
+          <button class="btn btn-danger" style="margin-top: 10px;">Annuler la réservation</button>
+        </div>
+        
         <div class="nav-links">
-          ${req.session.userId ? 
-            `<p>Connecté en tant que: ${escapeHtml(req.session.userEmail)}</p>
-             <a href="/logout" class="btn btn-secondary">Se déconnecter</a>` :
-            `<a href="/login" class="btn btn-primary">Se connecter</a>
-             <a href="/register" class="btn btn-secondary">S'inscrire</a>`
-          }
+          <a href="/" class="btn btn-secondary">Retour à l'accueil</a>
+          <a href="/catalogue" class="btn btn-primary">Nouvelle réservation</a>
         </div>
       </div>
     `
   });
+});
+
+// Route Profil (protégée par authentification)
+app.get('/profile', requireAuth, async (req, res) => {
+  try {
+    const { getPool } = require('./config/database');
+    const pool = getPool();
+    const result = await pool.query(
+      'SELECT nom, prenom, email, image, description, created_at FROM users WHERE id = $1',
+      [req.session.userId]
+    );
+    
+    const user = result.rows[0];
+    
+    res.render('layout', {
+      title: 'Mon Profil - Rent a Cat',
+      body: `
+        <div class="container">
+          <h1>Mon Profil</h1>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>👤 Informations personnelles</h3>
+            <p><strong>Nom:</strong> ${escapeHtml(user.nom)}</p>
+            <p><strong>Prénom:</strong> ${escapeHtml(user.prenom)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(user.email)}</p>
+            <p><strong>Membre depuis:</strong> ${new Date(user.created_at).toLocaleDateString('fr-FR')}</p>
+            
+            ${user.description ? 
+              `<p><strong>Description:</strong> ${escapeHtml(user.description)}</p>` : 
+              `<p><em>Aucune description ajoutée</em></p>`
+            }
+            
+            ${user.image ? 
+              `<div style="margin-top: 15px;">
+                 <img src="${escapeHtml(user.image)}" alt="Photo de profil" style="max-width: 150px; border-radius: 8px;">
+               </div>` : 
+              `<p><em>Aucune photo de profil</em></p>`
+            }
+          </div>
+          
+          <div class="nav-links">
+            <a href="/" class="btn btn-secondary">Retour à l'accueil</a>
+            <a href="/profile/edit" class="btn btn-primary">Modifier mon profil</a>
+            <a href="/reservations" class="btn btn-primary">Mes réservations</a>
+          </div>
+        </div>
+      `
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération du profil:', error);
+    res.status(500).render('layout', {
+      title: 'Erreur - Rent a Cat',
+      body: `
+        <div class="container">
+          <h1>Erreur</h1>
+          <div class="error">Une erreur est survenue lors du chargement de votre profil.</div>
+          <a href="/" class="btn btn-secondary">Retour à l'accueil</a>
+        </div>
+      `
+    });
+  }
 });
 
 // Route de déconnexion

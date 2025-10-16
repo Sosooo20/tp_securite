@@ -1,8 +1,8 @@
-# ChatRental - Plateforme sécurisée de location de chats
+# Rent a Cat - Plateforme sécurisée de location de chats
 
 ## Description
 
-ChatRental est une application web sécurisée permettant de louer un chat pour la journée. Ce projet a été développé avec un focus particulier sur la sécurité web.
+Rent a Cat est une application web sécurisée permettant de louer un chat pour la journée. Ce projet a été développé avec un focus particulier sur la sécurité web.
 
 ## Prérequis
 
