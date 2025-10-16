@@ -30,7 +30,6 @@ class HomeController {
                <p>📧 Email: <strong>${escapeHtml(req.session.userEmail)}</strong></p>
                <div class="nav-links">
                  <a href="/reservations" class="btn btn-primary">Mes Réservations</a>
-                 <a href="/profile" class="btn btn-secondary">Mon Profil</a>
                </div>
              </div>` :
             `<div class="welcome-content">

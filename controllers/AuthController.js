@@ -87,7 +87,6 @@ class AuthController {
         });
       }
 
-      // Vérification du mot de passe
       const isPasswordValid = await AuthService.verifyPassword(user.mot_de_passe, password);
       if (!isPasswordValid) {
         return res.status(401).render('layout', {

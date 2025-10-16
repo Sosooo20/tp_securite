@@ -12,7 +12,6 @@ const { generalLimiter } = require('./middlewares/rateLimiter');
 // Import des routes
 const indexRoutes = require('./routes/index');
 const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -81,7 +80,6 @@ app.locals.escapeHtml = escapeHtml;
 // Routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
-app.use('/profile', profileRoutes);
 
 // Middleware de gestion d'erreur
 app.use((err, req, res, next) => {
