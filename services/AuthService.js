@@ -42,6 +42,8 @@ class AuthService {
     req.session.userId = user.id;
     req.session.userEmail = user.email;
     req.session.userName = `${user.prenom} ${user.nom}`;
+      req.session.admin = user.administrateur;
+      req.session.perso = user.perso;
   }
 
   /**

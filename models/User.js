@@ -50,7 +50,7 @@ class User {
       const { nom, prenom, email, password } = userData;
       
       const result = await pool.query(
-        'INSERT INTO users (nom, prenom, email, mot_de_passe) VALUES ($1, $2, $3, $4) RETURNING id, nom, prenom, email, created_at',
+        'INSERT INTO users (nom, prenom, email, mot_de_passe, administrateur, perso) VALUES ($1, $2, $3, $4, 0, 1) RETURNING id, nom, prenom, email, created_at, administrateur, perso',
         [nom, prenom, email, password]
       );
       

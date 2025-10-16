@@ -32,6 +32,11 @@
                                 </button>
                             </form>
                         </li>
+                        <% if (session.admin) { %>
+                            <li class="nav-item">
+                                <a href="/ajout" class="nav-link">Créer un chat</a>
+                            </li>
+                        <% } %>
                     <% } else { %>
                         <!-- Utilisateur non connecté -->
                         <li class="nav-item">

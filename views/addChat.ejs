@@ -1,0 +1,25 @@
+<% layout('layout') %>
+
+<h2>Ajouter un chat</h2>
+
+<% if (error) { %>
+  <p style="color:red"><%= error %></p>
+<% } %>
+
+<form action="/ajout" method="POST">
+  <label>Nom : <input type="text" name="nom" required></label><br>
+  <label>Âge : <input type="number" name="age" required></label><br>
+  <label>Race : <input type="text" name="race"></label><br>
+  <label>Couleur : <input type="text" name="couleur"></label><br>
+  <label>Caractère : <input type="text" name="caractere"></label><br>
+  <label>Jouet préféré : <input type="text" name="jouet_prefere"></label><br>
+  <label>Prix : <input type="number" name="prix" step="0.01"></label><br>
+  <label>Description : <textarea name="description"></textarea></label><br>
+  <label>Disponible :
+    <select name="disponible">
+      <option value="true">Oui</option>
+      <option value="false">Non</option>
+    </select>
+  </label><br><br>
+  <button type="submit">Ajouter</button>
+</form>

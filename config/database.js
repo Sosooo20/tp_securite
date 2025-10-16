@@ -58,6 +58,8 @@ async function initDatabase() {
                 mot_de_passe VARCHAR(255) NOT NULL,
                 image VARCHAR(255) NULL,
                 description TEXT NULL,
+                administrateur int,
+                perso int,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )

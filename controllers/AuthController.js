@@ -103,6 +103,9 @@ class AuthController {
       // Créer la session
       AuthService.createUserSession(req, user);
 
+        req.session.admin = user.administrateur;
+        req.session.perso = user.perso;
+
       console.log(`Connexion réussie pour l'utilisateur: ${email} (ID: ${user.id})`);
       res.redirect('/');
 

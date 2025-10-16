@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { initDatabase } = require('./config/database');
 
+
 // Import des middlewares
 const csrfMiddleware = require('./middlewares/csrf');
 const { generalLimiter } = require('./middlewares/rateLimiter');
@@ -12,6 +13,8 @@ const { generalLimiter } = require('./middlewares/rateLimiter');
 // Import des routes
 const indexRoutes = require('./routes/index');
 const authRoutes = require('./routes/auth');
+const chatRoutes = require('./routes/ajoutRoute');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -80,6 +83,8 @@ app.locals.escapeHtml = escapeHtml;
 // Routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
+app.use('/', chatRoutes);
+
 
 // Middleware de gestion d'erreur
 app.use((err, req, res, next) => {
