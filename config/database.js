@@ -70,8 +70,8 @@ async function initDatabase() {
         // --- TABLE CHATS ---
         await pool.query(`
             CREATE TABLE IF NOT EXISTS chats (
-                                                 id SERIAL PRIMARY KEY,
-                                                 nom VARCHAR(255) NOT NULL,
+                id SERIAL PRIMARY KEY,
+                nom VARCHAR(255) NOT NULL,
                 age INT,
                 race VARCHAR(255),
                 couleur VARCHAR(255),
@@ -79,9 +79,11 @@ async function initDatabase() {
                 jouet_prefere VARCHAR(255),
                 prix INT,
                 description TEXT,
+                image VARCHAR(255) NULL,
+                disponible BOOLEAN DEFAULT true,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+            )
         `);
 
         // --- TABLE RESERVATIONS (many-to-many) ---
@@ -98,6 +100,24 @@ async function initDatabase() {
     `);
 
         console.log('✅ Tables "users", "chats" et "reservations" créées/vérifiées');
+
+        // Ajouter les colonnes manquantes à la table chats si elles n'existent pas
+        await pool.query(`
+            DO $$
+            BEGIN
+                -- Ajouter la colonne image si elle n'existe pas
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'chats' AND column_name = 'image') THEN
+                    ALTER TABLE chats ADD COLUMN image VARCHAR(255) NULL;
+                END IF;
+                
+                -- Ajouter la colonne disponible si elle n'existe pas
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'chats' AND column_name = 'disponible') THEN
+                    ALTER TABLE chats ADD COLUMN disponible BOOLEAN DEFAULT true;
+                END IF;
+            END
+            $$;
+        `);
+        console.log('✅ Colonnes image et disponible ajoutées à la table chats');
 
         // --- TRIGGERS POUR updated_at ---
         await pool.query(`
@@ -127,6 +147,20 @@ async function initDatabase() {
         }
 
         console.log('✅ Triggers créés pour users et chats');
+
+        // Ajouter des chats de démonstration s'il n'y en a pas
+        const chatCount = await pool.query('SELECT COUNT(*) FROM chats');
+        if (parseInt(chatCount.rows[0].count) === 0) {
+            await pool.query(`
+                INSERT INTO chats (nom, age, race, couleur, caractere, jouet_prefere, prix, description, disponible) VALUES
+                ('Minou', 3, 'Persan', 'Blanc', 'Câlin et doux', 'Balle en plumes', 25, 'Un chat très affectueux qui adore les câlins et jouer avec sa balle en plumes.', true),
+                ('Garfield', 5, 'Maine Coon', 'Orange', 'Gourmand et paresseux', 'Souris en peluche', 30, 'Chat imposant qui aime manger et dormir. Très calme et facile à vivre.', true),
+                ('Luna', 2, 'Siamois', 'Crème et brun', 'Curieuse et bavarde', 'Canne à pêche', 35, 'Chatte très intelligente et joueuse. Elle adore explorer et miauler pour communiquer.', true),
+                ('Simba', 4, 'British Shorthair', 'Gris', 'Indépendant mais affectueux', 'Tunnel en tissu', 28, 'Chat noble et calme. Il aime observer depuis son perchoir et se faire caresser.', true)
+            `);
+            console.log('✅ Chats de démonstration ajoutés');
+        }
+
         console.log('✅ Base de données PostgreSQL initialisée avec succès');
         return pool;
     } catch (error) {

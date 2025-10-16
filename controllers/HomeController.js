@@ -1,48 +1,35 @@
+const Chat = require('../models/Chat');
+
 /**
  * Contrôleur pour les pages principales
  */
 class HomeController {
   /**
-   * Affiche la page d'accueil
+   * Affiche la page d'accueil avec la liste des chats
    */
-  static showHome(req, res) {
-    // Helper pour échapper HTML (protection XSS supplémentaire)
-    const escapeHtml = (text) => {
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return text ? text.replace(/[&<>"']/g, (m) => map[m]) : '';
-    };
+  static async showHome(req, res) {
+    try {
+      // Récupérer tous les chats disponibles
+      const chats = await Chat.findAll();
 
-    res.render('layout', {
-      title: 'Accueil - Rent a Cat',
-      body: `
-        <div class="container welcome-content">
-          <h1>Bienvenue sur Rent a Cat</h1>
-          <p>La plateforme sécurisée pour louer un chat pour la journée!</p>
-          ${req.session.userId ? 
-            `<div class="welcome-content">
-               <p>✅ Connecté en tant que: <strong>${escapeHtml(req.session.userName)}</strong></p>
-               <p>📧 Email: <strong>${escapeHtml(req.session.userEmail)}</strong></p>
-               <div class="nav-links">
-                 <a href="/reservations" class="btn btn-primary">Mes Réservations</a>
-               </div>
-             </div>` :
-            `<div class="welcome-content">
-               <p>Connectez-vous pour accéder à toutes les fonctionnalités !</p>
-               <div class="nav-links">
-                 <a href="/login" class="btn btn-primary">Se connecter</a>
-                 <a href="/register" class="btn btn-secondary">Créer un compte</a>
-               </div>
-             </div>`
-          }
-        </div>
-      `
-    });
+      res.render('home', {
+        title: 'Accueil - Rent a Cat',
+        chats: chats,
+        session: req.session
+      });
+    } catch (error) {
+      console.error('Erreur lors du chargement de la page d\'accueil:', error);
+      res.status(500).render('layout', {
+        title: 'Erreur - Rent a Cat',
+        body: `
+          <div class="container">
+            <h1>Erreur</h1>
+            <div class="error">Une erreur est survenue lors du chargement de la page.</div>
+            <a href="/" class="btn btn-secondary">Réessayer</a>
+          </div>
+        `
+      });
+    }
   }
 
   /**

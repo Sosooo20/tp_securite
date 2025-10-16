@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="/images/rent_a_cat.jpg" alt="Rent a Cat Logo">
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Accueil</a>
+                    </li>
+                    
+                    <% if (typeof session !== 'undefined' && session && session.userId) { %>
+                        <!-- Utilisateur connecté -->
+                        <li class="nav-item">
+                            <a href="/reservations" class="nav-link">Réservations</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="/logout" style="display: inline;">
+                                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 500;">
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <!-- Utilisateur non connecté -->
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="nav-link">Inscription</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        <div class="container">
+            <h1>Bienvenue sur Rent a Cat</h1>
+            <p>La plateforme sécurisée pour louer un chat pour la journée!</p>
+            
+            <% if (chats && chats.length > 0) { %>
+                <div class="container">
+                    <h2>Nos chats disponibles à la réservation</h2>
+                    <ul>
+                        <% chats.forEach(chat => { %>
+                            <li>
+                                <strong><%= chat.nom %></strong> - <%= chat.race %> - <%= chat.age %> ans<br>
+                                Caractère: <%= chat.caractere %><br>
+                                Jouet préféré: <%= chat.jouet_prefere %><br>
+                                Prix: <%= chat.prix %> €<br>
+                                Description: <%= chat.description %><br>
+                                <% if (chat.image) { %>
+                                    <img src="<%= chat.image %>" alt="<%= chat.nom %>" width="150">
+                                <% } %>
+                            </li>
+                            <hr>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } else { %>
+                <p>Aucun chat disponible pour le moment.</p>
+            <% } %>
+            
+        </div>
+    </main>
+</body>
+</html>
