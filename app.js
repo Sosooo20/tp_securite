@@ -27,7 +27,7 @@ const sessionConfig = {
 // Rate limiting pour les tentatives de connexion
 const loginLimiter = rateLimit({
   windowMs: 30 * 1000, // 30 secondes
-  max: 3, // 3 tentatives maximum
+  max: 5,
   message: {
     error: 'Trop de tentatives de connexion. Veuillez attendre 30 secondes.'
   },
@@ -142,34 +142,12 @@ const escapeHtml = (text) => {
 app.locals.escapeHtml = escapeHtml;
 
 // Routes
-app.get('/', (req, res) => {
-  res.render('layout', {
-    title: 'Accueil - Rent a Cat',
-    body: `
-      <div class="container welcome-content">
-        <h1>Bienvenue sur Rent a Cat</h1>
-        <p>La plateforme sécurisée pour louer un chat pour la journée!</p>
-        ${req.session.userId ? 
-          `<div class="welcome-content">
-             <p>✅ Connecté en tant que: <strong>${escapeHtml(req.session.userName)}</strong></p>
-             <p>📧 Email: <strong>${escapeHtml(req.session.userEmail)}</strong></p>
-             <div class="nav-links">
-               <a href="/reservations" class="btn btn-primary">Mes Réservations</a>
-               <a href="/profile" class="btn btn-secondary">Mon Profil</a>
-             </div>
-           </div>` :
-          `<div class="welcome-content">
-             <p>Connectez-vous pour accéder à toutes les fonctionnalités !</p>
-             <div class="nav-links">
-               <a href="/login" class="btn btn-primary">Se connecter</a>
-               <a href="/register" class="btn btn-secondary">Créer un compte</a>
-             </div>
-           </div>`
-        }
-      </div>
-    `
-  });
-});
+
+const catRoutes = require('./routes/catRoute');
+app.use('/', catRoutes);
+
+
+
 
 // Route Réservations (protégée par authentification)
 app.get('/reservations', requireAuth, (req, res) => {
