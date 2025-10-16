@@ -114,11 +114,11 @@
                                 <input type="date" id="dateFin" name="dateFin" min="<%= new Date().toISOString().split('T')[0] %>" required>
                             </div>
 
-                            <!-- Boutons après les champs -->
+                            <!-- Boutons -->
                             <div class="buttons-section" style="margin: 30px 0; text-align: center;">
                                 <div class="button-container" style="margin: 20px 0;">
                                     <button type="button" class="btn btn-info btn-prix" id="btnGenererPrix">
-                                        � Générer un prix
+                                        💰 Générer un prix
                                     </button>
                                 </div>
                                 
@@ -149,7 +149,6 @@
     </main>
 
     <script>
-        console.log('Script de réservation chargé');
         const prixParJour = <%= chat.prix %>;
         const chatId = <%= chat.id %>;
         const dateDebutInput = document.getElementById('dateDebut');
@@ -161,84 +160,49 @@
         const nombreJoursText = document.getElementById('nombreJoursText');
         const prixTotalText = document.getElementById('prixTotalText');
 
-        console.log('Prix par jour:', prixParJour);
-        console.log('Éléments trouvés:', {
-            dateDebutInput: !!dateDebutInput,
-            dateFinInput: !!dateFinInput,
-            btnGenererPrix: !!btnGenererPrix,
-            priceCalculation: !!priceCalculation,
-            periodText: !!periodText,
-            nombreJoursText: !!nombreJoursText,
-            prixTotalText: !!prixTotalText
-        });
-
         // Mettre à jour la date minimum pour la fin quand on change la date de début
         dateDebutInput.addEventListener('change', function() {
-            console.log('Date de début changée:', this.value);
             if (this.value) {
                 dateFinInput.min = this.value;
-                console.log('Date minimum mise à jour pour la fin');
             }
         });
 
-        // UNIQUE fonction pour calculer le prix
+        // Fonction pour calculer le nombre de jours entre deux dates
+        function calculerNombreJours(dateDebut, dateFin) {
+            const timeDiff = dateFin.getTime() - dateDebut.getTime();
+            return Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // différence en jours
+        }
+
+        // Fonction de génération du prix
         btnGenererPrix.addEventListener('click', function() {
-            console.log('=== BOUTON GÉNÉRER PRIX CLIQUÉ ===');
-            
-            // Vérifier que les deux dates sont sélectionnées
             if (!dateDebutInput.value || !dateFinInput.value) {
-                alert('Veuillez sélectionner les dates de début et de fin');
-                console.log('Dates manquantes');
+                alert('Veuillez sélectionner les deux dates.');
                 return;
             }
-
-            console.log('Dates sélectionnées:', {
-                debut: dateDebutInput.value,
-                fin: dateFinInput.value
-            });
 
             const dateDebut = new Date(dateDebutInput.value);
             const dateFin = new Date(dateFinInput.value);
 
-            // Vérifier que la date de fin est après la date de début
             if (dateFin <= dateDebut) {
-                alert('La date de fin doit être après la date de début');
-                console.log('Date de fin invalide');
+                alert('La date de fin doit être postérieure à la date de début.');
                 return;
             }
 
-            // Calculer le nombre de jours
-            const diffTime = Math.abs(dateFin - dateDebut);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            // Calculer le prix total
-            const prixTotal = diffDays * prixParJour;
+            const nombreJours = calculerNombreJours(dateDebut, dateFin);
+            const prixTotal = nombreJours * prixParJour;
 
-            console.log('Calculs:', {
-                diffTime: diffTime,
-                diffDays: diffDays,
-                prixParJour: prixParJour,
-                prixTotal: prixTotal
-            });
-
-            // Mettre à jour l'affichage
-            console.log('Mise à jour des éléments...');
+            // Mise à jour de l’affichage
             periodText.textContent = `Du ${dateDebut.toLocaleDateString('fr-FR')} au ${dateFin.toLocaleDateString('fr-FR')}`;
-            nombreJoursText.textContent = diffDays;
+            nombreJoursText.textContent = nombreJours;
             prixTotalText.textContent = prixTotal;
 
             // Afficher la section de calcul
             priceCalculation.style.display = 'block';
-            priceCalculation.style.visibility = 'visible';
-
-            console.log('=== CALCUL TERMINÉ ===');
-            console.log('Section affichée, prix total:', prixTotal);
         });
 
-        // Bouton réserver (pour plus tard)
+        // Bouton réserver (à implémenter plus tard)
         btnReserver.addEventListener('click', function() {
-            console.log('Bouton Réserver cliqué');
-            alert('Fonctionnalité de réservation à venir');
+            alert('Fonctionnalité de réservation à venir 🐾');
         });
     </script>
 </body>
